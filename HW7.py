@@ -35,49 +35,35 @@ def make_positions_table(data, cur, conn):
     conn.commit()
 
 ## [TASK 1]: 25 points
-# Finish the function make_players_table
-
-#     This function takes 3 arguments: JSON data,
-#         the database cursor, and the database connection object
-
-#     It iterates through the JSON data to get a list of players in the squad
-#     and loads them into a database table called 'Players'
-#     with the following columns:
-#         id ((datatype: int; Primary key) - note this comes from the JSON
-#         name (datatype: text)
-#         position_id (datatype: integer)
-#         birthyear (datatype: int)
-#         nationality (datatype: text)
-#     To find the position_id for each player, you will have to look up 
-#     the position in the Positions table we 
-#     created for you -- see make_positions_table above for details.
 
 def make_players_table(data, cur, conn):
+
     cur.execute("CREATE TABLE IF NOT EXISTS Players (id INTEGER PRIMARY KEY, name TEXT, position_id INTEGER, birthyear INTEGER, nationality TEXT)")
+    
     for player in data['squad']:
         name = player['name']
         position = player['position']
         birthyear = int(player['dateOfBirth'][:4]) # Extract the birth year from the dateOfBirth string and convert it to an int
         nationality = player['nationality']
+        
         cur.execute("SELECT id FROM Positions WHERE position=?", (position,)) # Look up the position_id in the Positions table
         position_id = cur.fetchone()[0]
+        
         cur.execute("REPLACE INTO Players (id, name, position_id, birthyear, nationality) VALUES (?,?,?,?,?)", (player['id'], name, position_id, birthyear, nationality))
+    
     conn.commit()
 
 
 ## [TASK 2]: 10 points
-# Finish the function nationality_search
-
-    # This function takes 3 arguments as input: a list of countries,
-    # the database cursor, and database connection object. 
- 
-    # It selects all the players from any of the countries in the list
-    # and returns a list of tuples. Each tuple contains:
-        # the player's name, their position_id, and their nationality.
-        # Convert list of countries to a string for use in SQL query
 
 def nationality_search(countries, cur, conn):
-    pass
+
+    country = "'" + "','".join(countries) + "'"
+    query = f"SELECT name, position_id, nationality FROM Players WHERE nationality IN ({country})"
+    cur.execute(query)   
+    results = cur.fetchall()
+    
+    return results
 
 ## [TASK 3]: 10 points
 # finish the function birthyear_nationality_search
