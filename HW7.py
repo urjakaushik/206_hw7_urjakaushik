@@ -65,24 +65,12 @@ def nationality_search(countries, cur, conn):
     
     return results
 
-## [TASK 3]: 10 points
-# finish the function birthyear_nationality_search
-
-#     This function takes 4 arguments as input: 
-#     an age in years (int), 
-#     a country (string), the database cursor, 
-#     and the database connection object.
-
-#     It selects all the players from the country passed to the function 
-#     that were born BEFORE (2023 minus the year passed)
-#     for example: if we pass 19 for the year, it should return 
-#     players with birthdates BEFORE 2004
-#     This function returns a list of tuples each containing 
-#     the player’s name, nationality, and birth year. 
-
 
 def birthyear_nationality_search(age, country, cur, conn):
-    pass
+    birth_year = 2023 - age
+    cur.execute("SELECT Players.name, Players.nationality, Players.birthyear FROM Players JOIN Positions ON Players.position_id = Positions.id WHERE Players.nationality = ? AND Players.birthyear < ?", (country, birth_year))
+    results = cur.fetchall()
+    return results 
 
 ## [TASK 4]: 15 points
 # finish the function position_birth_search
@@ -230,11 +218,11 @@ def main():
     conn.close()
 
 
-    seasons_json_data = read_data('football_PL.json')
-    cur2, conn2 = open_database('Football_seasons.db')
-    make_winners_table(seasons_json_data, cur2, conn2)
-    make_seasons_table(seasons_json_data, cur2, conn2)
-    conn2.close()
+    # seasons_json_data = read_data('football_PL.json')
+    # cur2, conn2 = open_database('Football_seasons.db')
+    # make_winners_table(seasons_json_data, cur2, conn2)
+    # make_seasons_table(seasons_json_data, cur2, conn2)
+    # conn2.close()
 
 
 if __name__ == "__main__":
